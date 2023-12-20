@@ -1,32 +1,20 @@
 package org.example;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.query.Query;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.LongStream;
 
 public class Main {
     public static void main(String[] args) {
-        Connection connection =  DatabaseConnection.getConnection();
+        final SessionFactory sessionFactory = Connection.createSessionFactory();
 
-        try {
-            Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery("select * from schools");
-
-            while (resultSet.next()) {
-                System.out.println(resultSet.getString(2));
-            }
-
-        } catch (SQLException e) {
-            System.err.println("SQL error: " + e.getMessage());
-        } finally {
-            if (connection != null) {
-                try {
-                    connection.close();
-                } catch (SQLException e) {
-                    System.err.println("Error closing connection: " + e.getMessage());
-                }
-            }
-        }
+        HibernateHandler.generateBooks(sessionFactory);
+        HibernateHandler.searchByName(sessionFactory, "Book #1");
+        HibernateHandler.updateBook(sessionFactory, 2, "Josh", "Paul Allen");
+        HibernateHandler.searchByName(sessionFactory, "Book #4");
     }
 }
